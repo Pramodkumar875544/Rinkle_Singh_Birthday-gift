@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Birthday Surprise</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    overflow: hidden;
+}
+
+.center {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.gift-box {
+    width: 120px;
+    height: 120px;
+    background: #ff4081;
+    position: relative;
+    cursor: pointer;
+    border-radius: 10px;
+    animation: bounce 1s infinite;
+}
+
+.lid {
+    width: 120px;
+    height: 30px;
+    background: #c2185b;
+    position: absolute;
+    top: -30px;
+    left: 0;
+    border-radius: 5px;
+    transition: 0.6s;
+}
+
+.open .lid {
+    transform: rotate(-45deg) translate(-20px, -40px);
+}
+
+@keyframes bounce {
+    0%,100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+.hidden { display: none; }
+
+h1 { font-size: 2.3rem; }
+
+.card {
+    background: rgba(255,255,255,0.15);
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 90%;
+    max-height: 60vh;
+    overflow-y: auto;
+    backdrop-filter: blur(10px);
+}
+
+.cake {
+    font-size: 60px;
+    margin: 10px 0;
+}
+
+#message {
+    text-align: left;
+    line-height: 1.6;
+    font-size: 1rem;
+    white-space: pre-line;
+}
+
+/* Confetti */
+canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="confetti"></canvas>
+
+<!-- 🎁 Surprise -->
+<div id="surprise" class="center">
+    <div class="gift-box" id="gift">
+        <div class="lid"></div>
+    </div>
+    <p>Tap the gift 🎁</p>
+</div>
+
+<!-- 🎉 Main -->
+<div id="main" class="center hidden">
+    <h1>🎂 Happy Birthday 🎉</h1>
+    <h2>Rinkle Singh</h2>
+
+    <div class="cake">🎂🕯️</div>
+
+    <div class="card">
+        <p><strong>Junior Engineer, UPPCL</strong></p>
+        <p id="message"></p>
+    </div>
+</div>
+
+<audio id="music" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"></audio>
+
+<script>
+// 🎁 Open Gift
+document.getElementById("gift").addEventListener("click", function() {
+    this.classList.add("open");
+
+    setTimeout(() => {
+        document.getElementById("surprise").style.display = "none";
+        document.getElementById("main").classList.remove("hidden");
+
+        startConfetti();
+        playMusic();
+        typeText();
+
+    }, 700);
+});
+
+// 🎵 Music
+function playMusic(){
+    document.getElementById("music").play().catch(()=>{});
+}
+
+// 💌 Full Birthday Message
+const text = `Wishing you a very Happy Birthday, Rinkle Singh! 🎂✨
+
+May your special day be filled with happiness, joy, and unforgettable moments. As a Junior Engineer at UPPCL, your dedication, hard work, and commitment are truly inspiring.
+
+You are not only building a bright career but also contributing meaningfully to society through your efforts.
+
+May this new year of your life bring you greater success, endless opportunities, and remarkable achievements. May all your dreams turn into reality and every step you take lead you closer to your goals.
+
+Stay blessed with good health, positivity, and prosperity. Keep shining and inspiring everyone around you with your determination and excellence.
+
+Once again, wishing you a fantastic birthday and a wonderful year ahead! 🎉🎁🎈`;
+
+let i = 0;
+
+function typeText(){
+    let msg = document.getElementById("message");
+    let interval = setInterval(() => {
+        msg.textContent += text.charAt(i);
+        i++;
+        if(i >= text.length) clearInterval(interval);
+    }, 25);
+}
+
+// 🎊 Confetti
+const canvas = document.getElementById("confetti");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let confetti = [];
+
+function Confetti(){
+    this.x = Math.random()*canvas.width;
+    this.y = Math.random()*canvas.height - canvas.height;
+    this.size = Math.random()*6+2;
+    this.speed = Math.random()*3+2;
+    this.color = `hsl(${Math.random()*360},100%,50%)`;
+}
+
+Confetti.prototype.update = function(){
+    this.y += this.speed;
+    if(this.y > canvas.height){
+        this.y = -10;
+        this.x = Math.random()*canvas.width;
+    }
+}
+
+Confetti.prototype.draw = function(){
+    ctx.fillStyle = this.color;
+    ctx.fillRect(this.x, this.y, this.size, this.size);
+}
+
+function startConfetti(){
+    confetti = [];
+    for(let i=0;i<150;i++){
+        confetti.push(new Confetti());
+    }
+    animate();
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    confetti.forEach(c=>{
+        c.update();
+        c.draw();
+    });
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize",()=>{
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+
+</body>
+</html>
